@@ -1,0 +1,286 @@
+/**
+ * @daggle-dev/admin-ui — Design Tokens & Utilities
+ *
+ * 유저 프로젝트의 CSS 진입점에서 아래처럼 import하세요:
+ *   @import '@daggle-dev/admin-ui/styles';
+ *
+ * Tailwind v4 기반 프로젝트라면 이것만으로 모든 컴포넌트 스타일이 동작합니다.
+ */
+
+/**
+ * 라이브러리 컴포넌트 번들(dist/)을 Tailwind 스캔 대상에 포함.
+ * 유저가 별도로 @source를 추가하지 않아도 됩니다.
+ * 경로는 설치 위치 기준: node_modules/@daggle-dev/admin-ui/src/styles/ → ../../dist
+ */
+@source "../../dist";
+
+/* ===== Daggle Design System: Color & Input Tokens ===== */
+@theme inline {
+  /* Primary */
+  --color-primary-normal: #ff5e5e;
+  --color-primary-natural: #f09082;
+  --color-primary-strong: #ce4848;
+
+  /* Label */
+  --color-label-strong: #000000;
+  --color-label-white: #ffffff;
+
+  /* Gray scale */
+  --color-gray-0: #ffffff;
+  --color-gray-30: #f6f7fa;
+  --color-gray-40: #ededf4;
+  --color-gray-50: #dfe0e4;
+  --color-gray-60: #c6c9d3;
+  --color-gray-70: #959bb1;
+  --color-gray-80: #565962;
+  --color-gray-90: #151515;
+
+  /* Semantic colors */
+  --color-red-normal: #e61919;
+  --color-red-natural: #b81414;
+  --color-red-strong: #2e0505;
+  --color-yellow-normal: #f2b50d;
+  --color-yellow-natural: #916d08;
+  --color-yellow-strong: #302403;
+  --color-blue-normal: #0059ff;
+  --color-blue-natural: #003699;
+  --color-blue-strong: #001233;
+
+  /* Input component tokens */
+  --color-input-border: #eeeff1;
+  --color-input-bg-hover: #f9fafa;
+  --color-input-bg-disabled: #eeeff1;
+  --color-input-border-disabled: #d6d7dc;
+  --color-input-placeholder: #a7a9b4;
+  --color-input-focus: #4788ff;
+}
+
+/* ===== Daggle Design System: Typography Utilities ===== */
+@layer utilities {
+  /* Display — ExtraBold 800, -1.5% */
+  .text-display-lg {
+    font-size: 3.0625rem;
+    line-height: 1.5;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+  }
+  .text-display-md {
+    font-size: 2.3125rem;
+    line-height: 1.5;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+  }
+  .text-display-sm {
+    font-size: 1.75rem;
+    line-height: 1.5;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+  }
+
+  /* H1 — Bold 700, -1.5% */
+  .text-h1-xlg,
+  .text-mobile-h1-lg {
+    font-size: 2rem;
+    line-height: 1.5;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+  .text-h1-lg {
+    font-size: 1.75rem;
+    line-height: 1.5;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+  .text-h1-md,
+  .text-mobile-h1-md {
+    font-size: 1.5rem;
+    line-height: 1.5;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+  .text-h1-sm,
+  .text-mobile-h1-sm {
+    font-size: 1.25rem;
+    line-height: 1.5;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+
+  /* H2 — SemiBold 600, -1.5% */
+  .text-h2-xlg {
+    font-size: 2rem;
+    line-height: 1.5;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+  .text-h2-lg {
+    font-size: 1.75rem;
+    line-height: 1.5;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+  .text-h2-md {
+    font-size: 1.5rem;
+    line-height: 1.5;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+  .text-h2-sm {
+    font-size: 1.25rem;
+    line-height: 1.5;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  /* Lead — Medium 500, -1% */
+  .text-lead-lg {
+    font-size: 1.75rem;
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .text-lead-md {
+    font-size: 1.5rem;
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .text-lead-sm {
+    font-size: 1.25rem;
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  /* Title — Bold 700, -1.5% */
+  .text-title-xlg {
+    font-size: 1.125rem;
+    line-height: 1.5;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+  .text-title-lg {
+    font-size: 1rem;
+    line-height: 1.5;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+  .text-title-md {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+  .text-title-sm {
+    font-size: 0.75rem;
+    line-height: 1.4;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+
+  /* Subtitle — SemiBold 600, -2.5% */
+  .text-subtitle-xlg {
+    font-size: 1.125rem;
+    line-height: 1.5;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+  .text-subtitle-lg {
+    font-size: 1rem;
+    line-height: 1.5;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+  .text-subtitle-md {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+  .text-subtitle-sm {
+    font-size: 0.75rem;
+    line-height: 1.4;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+
+  /* Body — Medium 500, -2.5% */
+  .text-body-1 {
+    font-size: 1.125rem;
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+  }
+  .text-body-2 {
+    font-size: 1.0625rem;
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+  }
+  .text-body-3 {
+    font-size: 1rem;
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+  }
+  .text-body-4 {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+  }
+  .text-body-5 {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+  }
+
+  /* Caption — Medium 500, -2.5% */
+  .text-caption-caption {
+    font-size: 0.75rem;
+    line-height: 1.4;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+  }
+}
+
+/* ===== Sonner / Toaster: Figma Center Toast 스타일 ===== */
+.toast-figma {
+  padding: 24px 32px !important;
+  gap: 16px !important;
+  border-radius: 20px !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(7.5px);
+  background: var(--color-gray-90) !important;
+  color: var(--color-label-white);
+  border: none !important;
+}
+
+.toaster [data-sonner-toast] {
+  padding: 24px 32px !important;
+  gap: 16px !important;
+  border-radius: 20px !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(7.5px);
+  background: var(--color-gray-90) !important;
+  color: var(--color-label-white);
+  border: none !important;
+}
+
+.toaster [data-sonner-toast] [data-title] {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.015em;
+}
+
+.toaster [data-sonner-toast] [data-close-button] {
+  width: 24px;
+  height: 24px;
+  color: var(--color-label-white);
+}
+
+.toaster [data-sonner-toast] [data-close-button]:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
