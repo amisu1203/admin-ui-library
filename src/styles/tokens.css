@@ -53,6 +53,22 @@
   --color-input-border-disabled: #d6d7dc;
   --color-input-placeholder: #a7a9b4;
   --color-input-focus: #4788ff;
+  /** 포커스 시 테두리용 (strong) */
+  --color-border-strong: #000000;
+  /** 드롭다운 placeholder (Figma Label/assistive) */
+  --color-label-assistive: #c8c9d0;
+  /** Figma label natural */
+  --color-label-natural: #5e616e;
+  /** Figma black-1 */
+  --color-black-1: #0e0e0f;
+  /** Calendar caption text */
+  --color-gray-100: #060812;
+  /** Calendar range middle background */
+  --color-calendar-range-bg: #f2edfd;
+  /** Component alternative bg */
+  --color-component-alternative: #e9e9ec;
+  /** Calendar selected / primary accent */
+  --color-component-accent: #6025e1;
 }
 
 /* ===== Daggle Design System: Typography Utilities ===== */
