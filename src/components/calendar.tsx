@@ -26,10 +26,10 @@ function Calendar({ className, classNames, ...props }: CalendarProps) {
           'absolute right-4 top-6 flex items-center gap-3',
       
         button_previous:
-          'inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded text-[var(--color-input-placeholder)]',
+          'inline-flex z-10 size-6 shrink-0 cursor-pointer items-center justify-center rounded text-[var(--color-input-placeholder)]',
       
         button_next:
-          'inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded text-[var(--color-input-placeholder)]',
+          'inline-flex z-10 size-6 shrink-0 cursor-pointer items-center justify-center rounded text-[var(--color-input-placeholder)]',
       
         month_grid: 'w-full border-collapse',
         weekdays: 'grid grid-cols-7 px-2',
