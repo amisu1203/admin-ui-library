@@ -59,6 +59,10 @@ function DateRangeToggle({
     const updatePosition = () => {
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
+      const anchorButton = containerRef.current?.querySelector(
+        `button[data-toggle-value="${calendarOptionValue}"]`,
+      ) as HTMLButtonElement | null;
+      const anchorRect = anchorButton?.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
       const panelHeight = panelRef.current?.offsetHeight ?? 460;
       const offset = 8;
@@ -69,7 +73,7 @@ function DateRangeToggle({
         top: shouldOpenUpward
           ? Math.max(offset, rect.top - panelHeight - offset)
           : rect.bottom + offset,
-        left: rect.left,
+        left: anchorRect?.left ?? rect.left,
       });
     };
 
@@ -85,6 +89,7 @@ function DateRangeToggle({
   const handleToday = () => {
     const today = new Date();
     setDraftRange({ from: today, to: today });
+    setMonth(new Date(today.getFullYear(), today.getMonth(), 1));
   };
 
   const handleCancel = () => {

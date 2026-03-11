@@ -38,6 +38,7 @@ function ToggleGroup({
           <button
             key={option.value}
             type="button"
+            data-toggle-value={option.value}
             role="radio"
             aria-checked={selected}
             disabled={option.disabled}
