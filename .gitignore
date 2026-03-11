@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Build & cache
+dist/
+.vite/
+dev/.vite/
+.turbo/
+*.tsbuildinfo
+
+# Package manager
+.pnpm-store/
+*.tgz
+package-lock.json
+
+# Env & logs
+.env
+.env.*
+!.env.example
+*.log
+pnpm-debug.log*
+
+# OS & IDE
+.DS_Store
+.cursor/
+.idea/
+*.swp
+*.swo
+
+# Test / coverage
+coverage/
