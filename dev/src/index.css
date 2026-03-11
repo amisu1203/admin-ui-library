@@ -1,0 +1,5 @@
+@import 'tailwindcss';
+@import '../../src/styles/tokens.css';
+
+/* 라이브러리 컴포넌트에서 사용하는 클래스가 스캔되도록 소스 경로 추가 */
+@source "../../src/**/*.{ts,tsx}";
