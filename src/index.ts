@@ -32,5 +32,39 @@ export {
 } from './lib/filter-control-rules';
 export { Toaster } from './components/sonner';
 
+// Table primitives
+export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from './components/table';
+
+// Pagination primitives
+export {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationButton,
+  PaginationPrevious,
+  PaginationNext,
+} from './components/pagination';
+export type { PaginationButtonProps } from './components/pagination';
+
+// Data table (pattern + convenience layer)
+export {
+  PageSizeSelect,
+  TableQueryInfo,
+  DataTableToolbar,
+  DataTablePagination,
+  DataTable,
+  useDataTableState,
+  getPageNumbers,
+} from './components/data-table';
+export type {
+  PageSizeSelectProps,
+  TableQueryInfoProps,
+  DataTableToolbarProps,
+  DataTablePaginationProps,
+  DataTableProps,
+  UseDataTableStateOptions,
+  UseDataTableStateReturn,
+} from './components/data-table';
+
 // Types
 export type { ButtonProps, ButtonVariants } from './components/button';
