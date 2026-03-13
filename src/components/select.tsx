@@ -8,7 +8,7 @@ const triggerBaseClass =
 
 /** Figma SelectItem list: white, border #EEEFF1, rounded-8, shadow. max-h로 넘치면 스크롤 */
 const listBaseClass =
-  'absolute left-0 right-0 top-full z-50 mt-2 max-h-60 overflow-y-auto overflow-x-hidden rounded-lg border border-[var(--color-input-border)] bg-white py-2 shadow-[0_4px_24px_rgba(0,0,0,0.1)]';
+  'absolute left-0 right-0 z-50 max-h-60 overflow-y-auto overflow-x-hidden rounded-lg border border-[var(--color-input-border)] bg-white py-2 shadow-[0_4px_24px_rgba(0,0,0,0.1)]';
 
 /** Figma SelectItem row: outer p-8, inner content p-12 → py-3 px-4 (12px 16px) */
 const itemBaseClass =
@@ -83,6 +83,7 @@ function Select(props: SelectProps) {
 
   const isMultiple = props.multiple === true;
   const [open, setOpen] = React.useState(false);
+  const [dropUp, setDropUp] = React.useState(false);
   const [highlightedIndex, setHighlightedIndex] = React.useState(-1);
   const [liveAnnouncement, setLiveAnnouncement] = React.useState('');
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -107,6 +108,11 @@ function Select(props: SelectProps) {
 
   const handleTriggerClick = () => {
     if (disabled) return;
+    if (!open && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      // max-h-60 = 240px, mt-2 = 8px → 248px 필요
+      setDropUp(window.innerHeight - rect.bottom < 248);
+    }
     setOpen((prev) => !prev);
   };
 
@@ -284,7 +290,7 @@ function Select(props: SelectProps) {
         <div
           ref={listboxRef}
           id={listboxId}
-          className={listBaseClass}
+          className={cn(listBaseClass, dropUp ? 'bottom-full mb-2' : 'top-full mt-2')}
           role="listbox"
           aria-multiselectable={isMultiple || undefined}
         >

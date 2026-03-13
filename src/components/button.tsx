@@ -19,16 +19,16 @@ const buttonVariants = cva(
         destructive:
           'bg-destructive text-label-white hover:bg-destructive/90 focus-visible:ring-destructive disabled:bg-gray-40 disabled:text-gray-70',
         outline:
-          'border-2 border-gray-60 bg-transparent text-gray-90 hover:bg-gray-40 focus-visible:ring-blue-normal disabled:border-gray-40 disabled:bg-gray-40 disabled:text-gray-70',
+          'border border-gray-60 bg-transparent text-gray-90 hover:bg-gray-40 focus-visible:ring-blue-normal disabled:border-gray-40 disabled:bg-gray-40 disabled:text-gray-70',
         /** outline-primary: primary 테두리/텍스트 */
         'outline-primary':
-          'border-2 border-primary-normal bg-transparent text-primary-normal hover:bg-primary-normal/10 focus-visible:ring-blue-normal disabled:border-gray-40 disabled:bg-gray-40 disabled:text-gray-70',
+          'border border-primary-normal bg-transparent text-primary-normal hover:bg-primary-normal/10 focus-visible:ring-blue-normal disabled:border-gray-40 disabled:bg-gray-40 disabled:text-gray-70',
         /** outline-strong: gray-90 테두리/텍스트 */
         'outline-strong':
-          'border-2 border-gray-90 bg-transparent text-gray-90 hover:bg-gray-40 focus-visible:ring-blue-normal disabled:border-gray-40 disabled:bg-gray-40 disabled:text-gray-70',
+          'border border-gray-90 bg-transparent text-gray-90 hover:bg-gray-40 focus-visible:ring-blue-normal disabled:border-gray-40 disabled:bg-gray-40 disabled:text-gray-70',
         /** outline-natural: gray-50 테두리, gray-90 텍스트 */
         'outline-natural':
-          'border-2 border-gray-50 bg-transparent text-gray-90 hover:bg-gray-40 focus-visible:ring-blue-normal disabled:border-gray-40 disabled:bg-gray-40 disabled:text-gray-70',
+          'border border-gray-50 bg-transparent text-gray-90 hover:bg-gray-40 focus-visible:ring-blue-normal disabled:border-gray-40 disabled:bg-gray-40 disabled:text-gray-70',
         secondary:
           'bg-secondary text-secondary-foreground hover:bg-secondary/80 disabled:bg-gray-40 disabled:text-gray-70',
         ghost:
