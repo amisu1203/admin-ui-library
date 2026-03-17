@@ -1,6 +1,6 @@
 {
   "name": "@daggle-dev/admin-ui",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Daggle Admin UI component library",
   "license": "MIT",
   "main": "./dist/index.js",
