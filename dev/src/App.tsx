@@ -1,17 +1,65 @@
 import { useState } from 'react';
 import { type DateRange } from 'react-day-picker';
+// DateRange는 DatePicker에서도 re-export 되므로 이쪽에서만 import
 import {
   Button,
-  DateRangeToggle,
+  Checkbox,
+  DataTable,
+  DataTablePagination,
+  DataTableToolbar,
+  DatePicker,
   FilterBox,
   Input,
+  PageSizeSelect,
   Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableQueryInfo,
+  TableRow,
   Textarea,
   useCheckboxFilterControl,
+  useDataTableState,
   useToggleFilterControl,
 } from '@daggle-dev/admin-ui';
 import type { FilterRowConfig } from '@daggle-dev/admin-ui';
 
+// ─── 테이블 더미 데이터 ────────────────────────────────────────────────────────
+type Product = {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  stock: number;
+  status: 'active' | 'inactive' | 'pending';
+  createdAt: string;
+};
+
+const ALL_PRODUCTS: Product[] = Array.from({ length: 37 }, (_, i) => ({
+  id: String(i + 1),
+  name: `상품 ${i + 1}`,
+  category: ['전자기기', '의류', '식품', '도서', '스포츠'][i % 5],
+  price: (i + 1) * 9800,
+  stock: (i * 7) % 120,
+  status: (['active', 'inactive', 'pending'] as const)[i % 3],
+  createdAt: new Date(2024, i % 12, (i % 28) + 1).toLocaleDateString('ko-KR'),
+}));
+
+const STATUS_LABEL: Record<Product['status'], string> = {
+  active: '판매 중',
+  inactive: '비활성',
+  pending: '검토 중',
+};
+
+const STATUS_COLOR: Record<Product['status'], string> = {
+  active: 'text-blue-normal',
+  inactive: 'text-gray-60',
+  pending: 'text-yellow-normal',
+};
+
+// ─── 과일 옵션 ────────────────────────────────────────────────────────────────
 const fruitOptions = [
   { value: 'apple', label: '사과' },
   { value: 'banana', label: '바나나' },
@@ -32,6 +80,31 @@ export default function App() {
   const [multi, setMulti] = useState<string[]>([]);
   const [dateMode, setDateMode] = useState('all');
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
+
+  // ─── DatePicker 상태 ─────────────────────────────────────────────────────
+  const [pickedDate, setPickedDate] = useState<Date | undefined>();
+  const [pickedDateWithLabel, setPickedDateWithLabel] = useState<Date | undefined>();
+  const [pickedDateError, setPickedDateError] = useState<Date | undefined>();
+  const [pickedRange, setPickedRange] = useState<DateRange | undefined>();
+  const [pickedRangeWithLabel, setPickedRangeWithLabel] = useState<DateRange | undefined>();
+
+  // ─── 테이블 상태 ────────────────────────────────────────────────────────
+  const { page, pageSize, onPageChange, onPageSizeChange } = useDataTableState({ initialPageSize: 10 });
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const totalPages = Math.ceil(ALL_PRODUCTS.length / pageSize);
+  const pagedItems = ALL_PRODUCTS.slice((page - 1) * pageSize, page * pageSize);
+  const isAllSelected = pagedItems.length > 0 && pagedItems.every((p) => selectedIds.includes(p.id));
+
+  const toggleAll = () => {
+    if (isAllSelected) {
+      setSelectedIds((prev) => prev.filter((id) => !pagedItems.map((p) => p.id).includes(id)));
+    } else {
+      setSelectedIds((prev) => [...new Set([...prev, ...pagedItems.map((p) => p.id)])]);
+    }
+  };
+  const toggleOne = (id: string) =>
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]));
 
   // FilterBox: 체크박스는 단일 선택, 값 변경 규칙은 훅에서 관리
   const statusControl = useCheckboxFilterControl('all');
@@ -281,6 +354,231 @@ export default function App() {
           </div>
         </div>
       </div>
+
+      {/* ── DatePicker ──────────────────────────────────────────────────── */}
+      <div className="mt-12">
+        <h2 className="text-h2-md text-gray-90 mb-4">DatePicker 컴포넌트 테스트</h2>
+
+        <h3 className="text-h2-sm text-gray-80 mb-3">mode="single" (단일 날짜)</h3>
+        <div className="flex flex-col gap-6 w-80 mb-10">
+          <div>
+            <p className="text-body-5 text-gray-70 mb-2">기본 (placeholder)</p>
+            <DatePicker value={pickedDate} onChange={setPickedDate} />
+          </div>
+          <div>
+            <p className="text-body-5 text-gray-70 mb-2">
+              라벨 + 선택된 날짜: {pickedDateWithLabel?.toLocaleDateString('ko-KR') ?? '없음'}
+            </p>
+            <DatePicker
+              label="시작일"
+              value={pickedDateWithLabel}
+              onChange={setPickedDateWithLabel}
+            />
+          </div>
+          <div>
+            <p className="text-body-5 text-gray-70 mb-2">에러 상태</p>
+            <DatePicker
+              label="종료일"
+              value={pickedDateError}
+              onChange={setPickedDateError}
+              errorMessage="날짜를 선택해 주세요."
+            />
+          </div>
+          <div>
+            <p className="text-body-5 text-gray-70 mb-2">비활성</p>
+            <DatePicker label="등록일" disabled />
+          </div>
+        </div>
+
+        <h3 className="text-h2-sm text-gray-80 mb-3">mode="range" (기간 선택)</h3>
+        <div className="flex flex-col gap-6 w-80">
+          <div>
+            <p className="text-body-5 text-gray-70 mb-2">
+              기본 — 선택된 기간:{' '}
+              {pickedRange?.from && pickedRange?.to
+                ? `${pickedRange.from.toLocaleDateString('ko-KR')} ~ ${pickedRange.to.toLocaleDateString('ko-KR')}`
+                : '없음'}
+            </p>
+            <DatePicker mode="range" value={pickedRange} onChange={setPickedRange} />
+          </div>
+          <div>
+            <p className="text-body-5 text-gray-70 mb-2">
+              라벨 + 선택된 기간:{' '}
+              {pickedRangeWithLabel?.from && pickedRangeWithLabel?.to
+                ? `${pickedRangeWithLabel.from.toLocaleDateString('ko-KR')} ~ ${pickedRangeWithLabel.to.toLocaleDateString('ko-KR')}`
+                : '없음'}
+            </p>
+            <DatePicker
+              mode="range"
+              label="조회 기간"
+              value={pickedRangeWithLabel}
+              onChange={setPickedRangeWithLabel}
+            />
+          </div>
+          <div>
+            <p className="text-body-5 text-gray-70 mb-2">에러 상태</p>
+            <DatePicker
+              mode="range"
+              label="등록 기간"
+              errorMessage="기간을 선택해 주세요."
+            />
+          </div>
+          <div>
+            <p className="text-body-5 text-gray-70 mb-2">비활성</p>
+            <DatePicker mode="range" label="기간" disabled />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Table Primitives ────────────────────────────────────────────── */}
+      <div className="mt-12">
+        <h2 className="text-h2-md text-gray-90 mb-4">Table Primitives 테스트</h2>
+        <div className="overflow-hidden rounded-md border border-[var(--color-input-border)] bg-white">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-30 hover:bg-gray-30">
+                <TableHead className="w-12 border-r border-[var(--color-input-border)] px-0">
+                  <Checkbox checked={isAllSelected} onCheckedChange={toggleAll} aria-label="전체 선택" />
+                </TableHead>
+                <TableHead className="border-r border-[var(--color-input-border)]">상품명</TableHead>
+                <TableHead className="w-28 border-r border-[var(--color-input-border)]">카테고리</TableHead>
+                <TableHead className="w-32 border-r border-[var(--color-input-border)]">가격</TableHead>
+                <TableHead className="w-20 border-r border-[var(--color-input-border)]">재고</TableHead>
+                <TableHead className="w-24">상태</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {pagedItems.length === 0 ? (
+                <TableRow className="hover:bg-white">
+                  <TableCell colSpan={6} className="text-gray-70 h-24">조회된 상품이 없습니다.</TableCell>
+                </TableRow>
+              ) : (
+                pagedItems.map((item) => {
+                  const isChecked = selectedIds.includes(item.id);
+                  return (
+                    <TableRow
+                      key={item.id}
+                      className={isChecked ? 'bg-[#fffaf9] hover:bg-[#fffaf9]' : 'bg-white'}
+                    >
+                      <TableCell className="w-12 border-r border-[var(--color-input-border)] px-0">
+                        <Checkbox checked={isChecked} onCheckedChange={() => toggleOne(item.id)} aria-label={`${item.name} 선택`} />
+                      </TableCell>
+                      <TableCell className="border-r border-[var(--color-input-border)] text-left">{item.name}</TableCell>
+                      <TableCell className="w-28 border-r border-[var(--color-input-border)]">{item.category}</TableCell>
+                      <TableCell className="w-32 border-r border-[var(--color-input-border)]">{item.price.toLocaleString('ko-KR')}원</TableCell>
+                      <TableCell className="w-20 border-r border-[var(--color-input-border)]">{item.stock}</TableCell>
+                      <TableCell className={`w-24 font-semibold ${STATUS_COLOR[item.status]}`}>{STATUS_LABEL[item.status]}</TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+      {/* ── Pattern Layer (Toolbar / Pagination 단독) ───────────────────── */}
+      <div className="mt-12">
+        <h2 className="text-h2-md text-gray-90 mb-4">Pattern Layer 단독 테스트</h2>
+        <div className="flex flex-col gap-4 bg-white rounded-lg p-6 border border-[var(--color-input-border)]">
+          <div>
+            <p className="text-body-5 text-gray-70 mb-2">TableQueryInfo</p>
+            <TableQueryInfo currentCount={pagedItems.length} totalCount={ALL_PRODUCTS.length} />
+          </div>
+          <div>
+            <p className="text-body-5 text-gray-70 mb-2">TableQueryInfo (로딩 중)</p>
+            <TableQueryInfo currentCount={0} totalCount={0} isLoading />
+          </div>
+          <div>
+            <p className="text-body-5 text-gray-70 mb-2">PageSizeSelect</p>
+            <PageSizeSelect value={pageSize} onChange={onPageSizeChange} />
+          </div>
+          <div>
+            <p className="text-body-5 text-gray-70 mb-2">DataTableToolbar (조회 정보 + 버튼 슬롯)</p>
+            <DataTableToolbar
+              currentCount={pagedItems.length}
+              totalCount={ALL_PRODUCTS.length}
+            >
+              <Button variant="outline-natural" size="medium" disabled={selectedIds.length === 0}>
+                상태 변경
+              </Button>
+              <Button variant="fill" size="medium">생성하기</Button>
+            </DataTableToolbar>
+          </div>
+          <div>
+            <p className="text-body-5 text-gray-70 mb-2">DataTablePagination (PageSizeSelect 포함)</p>
+            <DataTablePagination
+              page={page}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+              showPageSizeSelect
+              pageSize={pageSize}
+              onPageSizeChange={onPageSizeChange}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* ── DataTable (통합 컴포넌트) ────────────────────────────────────── */}
+      <div className="mt-12">
+        <h2 className="text-h2-md text-gray-90 mb-4">DataTable 통합 컴포넌트 테스트</h2>
+        <DataTable
+          currentCount={pagedItems.length}
+          totalCount={ALL_PRODUCTS.length}
+          toolbar={
+            <>
+              <Button variant="outline-natural" size="medium" disabled={selectedIds.length === 0}>
+                상태 변경 ({selectedIds.length}건)
+              </Button>
+              <Button variant="fill" size="medium">생성하기</Button>
+            </>
+          }
+          page={page}
+          totalPages={totalPages}
+          onPageChange={onPageChange}
+          showPageSizeSelect
+          pageSize={pageSize}
+          onPageSizeChange={onPageSizeChange}
+        >
+          <Table className="min-w-[700px]">
+            <TableHeader>
+              <TableRow className="bg-gray-30 hover:bg-gray-30">
+                <TableHead className="w-12 border-r border-[var(--color-input-border)] px-0">
+                  <Checkbox checked={isAllSelected} onCheckedChange={toggleAll} aria-label="전체 선택" />
+                </TableHead>
+                <TableHead className="border-r border-[var(--color-input-border)]">상품명</TableHead>
+                <TableHead className="w-28 border-r border-[var(--color-input-border)]">카테고리</TableHead>
+                <TableHead className="w-32 border-r border-[var(--color-input-border)]">가격</TableHead>
+                <TableHead className="w-20 border-r border-[var(--color-input-border)]">재고</TableHead>
+                <TableHead className="w-28 border-r border-[var(--color-input-border)]">등록일</TableHead>
+                <TableHead className="w-24">상태</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {pagedItems.map((item) => {
+                const isChecked = selectedIds.includes(item.id);
+                return (
+                  <TableRow
+                    key={item.id}
+                    className={isChecked ? 'bg-[#fffaf9] hover:bg-[#fffaf9]' : 'bg-white'}
+                  >
+                    <TableCell className="w-12 border-r border-[var(--color-input-border)] px-0">
+                      <Checkbox checked={isChecked} onCheckedChange={() => toggleOne(item.id)} aria-label={`${item.name} 선택`} />
+                    </TableCell>
+                    <TableCell className="border-r border-[var(--color-input-border)] text-left">{item.name}</TableCell>
+                    <TableCell className="w-28 border-r border-[var(--color-input-border)]">{item.category}</TableCell>
+                    <TableCell className="w-32 border-r border-[var(--color-input-border)]">{item.price.toLocaleString('ko-KR')}원</TableCell>
+                    <TableCell className="w-20 border-r border-[var(--color-input-border)]">{item.stock}</TableCell>
+                    <TableCell className="w-28 border-r border-[var(--color-input-border)]">{item.createdAt}</TableCell>
+                    <TableCell className={`w-24 font-semibold ${STATUS_COLOR[item.status]}`}>{STATUS_LABEL[item.status]}</TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </DataTable>
+      </div>
+
       <div className='py-[400px]'/>
     </div>
   );

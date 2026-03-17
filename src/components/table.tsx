@@ -66,7 +66,7 @@ const TableCell = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <td
     ref={ref}
-    className={cn('h-[76px] px-3 text-center align-middle text-body-4 text-gray-90', className)}
+    className={cn('h-[76px] px-3 text-center align-middle text-caption text-gray-90', className)}
     {...props}
   />
 ));

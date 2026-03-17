@@ -99,6 +99,7 @@ function DateRangeToggle({
 
   const handleSelect = () => {
     onRangeChange?.(draftRange);
+    onChange?.(calendarOptionValue); // 확정 후 부모 value를 '기간 지정'으로 맞춤
     setIsCalendarOpen(false);
   };
   const isRangeComplete = Boolean(draftRange?.from && draftRange?.to);
@@ -122,10 +123,12 @@ function DateRangeToggle({
   };
 
   const handleToggleChange = (nextValue: string) => {
-    onChange?.(nextValue);
     if (nextValue === calendarOptionValue) {
+      // '기간 지정' 클릭 시: onChange 호출하지 않음. 달력만 노출.
+      // (부모가 value 변경을 받아 page 리셋 등을 하지 않도록 함. 확정은 '선택' 클릭 시 onRangeChange만.)
       setIsCalendarOpen(true);
     } else {
+      onChange?.(nextValue);
       setIsCalendarOpen(false);
     }
   };
@@ -140,7 +143,7 @@ function DateRangeToggle({
       <div className="flex items-center gap-3">
         <ToggleGroup
           options={options}
-          value={value}
+          value={isCalendarOpen ? calendarOptionValue : value}
           onChange={handleToggleChange}
           ariaLabel="기간 선택 토글"
         />

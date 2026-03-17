@@ -14,6 +14,8 @@ export { Calendar } from './components/calendar';
 export type { CalendarProps } from './components/calendar';
 export { DateRangeToggle } from './components/date-range-toggle';
 export type { DateRangeToggleProps } from './components/date-range-toggle';
+export { DatePicker } from './components/date-picker';
+export type { DatePickerProps } from './components/date-picker';
 export { FilterBox } from './components/filter-box';
 export type {
   FilterBoxProps,

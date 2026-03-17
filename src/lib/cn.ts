@@ -40,7 +40,7 @@ const customTwMerge = extendTailwindMerge({
         'text-body-3',
         'text-body-4',
         'text-body-5',
-        'text-caption-caption',
+        'text-caption',
       ],
     },
   },
