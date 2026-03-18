@@ -13,7 +13,7 @@ import { Select } from './select';
 
 // ─── PageSizeSelect ───────────────────────────────────────────────────────────
 
-const DEFAULT_PAGE_SIZE_OPTIONS = [10, 30, 50, 100];
+const DEFAULT_PAGE_SIZE_OPTIONS = [10, 30, 50, 100, 1000];
 
 export interface PageSizeSelectProps {
   value: number;
