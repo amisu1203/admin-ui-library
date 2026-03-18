@@ -279,6 +279,7 @@ function DatePicker(props: DatePickerProps) {
     // single: Calendar 컴포넌트 단독 (클릭 즉시 확정)
     <Calendar
       mode="single"
+      locale={ko}
       selected={(props as DatePickerSingleProps).value}
       onSelect={handleSingleSelect}
       {...calendarProps}
