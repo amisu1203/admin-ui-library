@@ -68,6 +68,8 @@ function usePanelPosition(
   panelRef: React.RefObject<HTMLDivElement | null>,
 ) {
   const [pos, setPos] = React.useState({ top: 0, left: 0 });
+  // 위치 계산 전까지 패널을 숨겨 (0,0) 위치에서 반짝이는 현상 방지
+  const [ready, setReady] = React.useState(false);
 
   const update = React.useCallback(() => {
     if (!containerRef.current) return;
@@ -80,10 +82,14 @@ function usePanelPosition(
       top: openUpward ? rect.top - panelHeight - offset : rect.bottom + offset,
       left: rect.left,
     });
+    setReady(true);
   }, [containerRef, panelRef]);
 
   React.useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      setReady(false);
+      return;
+    }
     update();
     window.addEventListener('resize', update);
     window.addEventListener('scroll', update, true);
@@ -93,7 +99,7 @@ function usePanelPosition(
     };
   }, [open, update]);
 
-  return pos;
+  return { pos, ready };
 }
 
 // ─── DatePicker ───────────────────────────────────────────────────────────────
@@ -152,7 +158,7 @@ function DatePicker(props: DatePickerProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rangeValue?.from, rangeValue?.to]);
 
-  const panelPosition = usePanelPosition(open, containerRef, panelRef);
+  const { pos: panelPosition, ready: panelReady } = usePanelPosition(open, containerRef, panelRef);
 
   // ── 공통: 외부 클릭 닫기 ──────────────────────────────────────────────────
   React.useEffect(() => {
@@ -319,7 +325,7 @@ function DatePicker(props: DatePickerProps) {
             role="dialog"
             aria-label={isRange ? '기간 선택' : '날짜 선택'}
             className={panelClass}
-            style={{ top: panelPosition.top, left: panelPosition.left }}
+            style={{ top: panelPosition.top, left: panelPosition.left, visibility: panelReady ? 'visible' : 'hidden' }}
           >
             {panelContent}
           </div>,
