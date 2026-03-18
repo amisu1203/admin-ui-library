@@ -41,7 +41,7 @@ function PageSizeSelect({
       onChange={(v) => onChange(Number(v))}
       options={selectOptions}
       ariaLabel="페이지당 개수"
-      className={cn('w-[140px] shrink-0', className)}
+      className={cn('w-[172px] shrink-0', className)}
     />
   );
 }
