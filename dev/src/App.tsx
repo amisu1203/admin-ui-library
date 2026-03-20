@@ -111,6 +111,8 @@ export default function App() {
   const dateControl = useToggleFilterControl('today');
   const categoryControl = useCheckboxFilterControl('all');
   const targetControl = useToggleFilterControl('all');
+  const [selectCategory, setSelectCategory] = useState('');
+  const [selectStatus, setSelectStatus] = useState('');
 
   const filterRowsCheckboxOnly: FilterRowConfig[] = [
     {
@@ -182,6 +184,47 @@ export default function App() {
     { value: 'month', label: '한달' },
     { value: 'three-month', label: '세달' },
     { value: 'custom', label: '기간 선택' },
+  ];
+
+  const categoryOptions = [
+    { value: 'all', label: '전체' },
+    { value: 'electronics', label: '전자기기' },
+    { value: 'clothing', label: '의류' },
+    { value: 'food', label: '식품' },
+    { value: 'book', label: '도서' },
+    { value: 'sports', label: '스포츠' },
+  ];
+
+  const statusOptions = [
+    { value: 'all', label: '전체' },
+    { value: 'active', label: '판매 중' },
+    { value: 'inactive', label: '비활성' },
+    { value: 'pending', label: '검토 중' },
+  ];
+
+  const filterRowsWithSelect: FilterRowConfig[] = [
+    {
+      key: 'category',
+      label: '카테고리',
+      control: {
+        type: 'select',
+        options: categoryOptions,
+        value: selectCategory,
+        onChange: setSelectCategory,
+        placeholder: '카테고리 선택',
+      },
+    },
+    {
+      key: 'status',
+      label: '판매 상태',
+      control: {
+        type: 'select',
+        options: statusOptions,
+        value: selectStatus,
+        onChange: setSelectStatus,
+        placeholder: '상태 선택',
+      },
+    },
   ];
 
   const filterRowsWithCalendar: FilterRowConfig[] = [
@@ -351,6 +394,12 @@ export default function App() {
               FilterBox 내 등록일 행 (기간 선택 시 캘린더 노출)
             </p>
             <FilterBox rows={filterRowsWithCalendar} />
+          </div>
+          <div>
+            <p className="text-body-5 text-gray-70 mb-2">
+              FilterBox 내 Select 드롭다운 (portal로 FilterBox 밖에 렌더)
+            </p>
+            <FilterBox rows={filterRowsWithSelect} />
           </div>
         </div>
       </div>

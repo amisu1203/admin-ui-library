@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { createPortal } from 'react-dom';
 
 import { cn } from '../lib/cn';
 
@@ -8,7 +9,7 @@ const triggerBaseClass =
 
 /** Figma SelectItem list: white, border #EEEFF1, rounded-8, shadow. max-h로 넘치면 스크롤 */
 const listBaseClass =
-  'absolute left-0 right-0 z-50 max-h-60 overflow-y-auto overflow-x-hidden rounded-lg border border-[var(--color-input-border)] bg-white py-2 shadow-[0_4px_24px_rgba(0,0,0,0.1)]';
+  'fixed z-50 max-h-60 overflow-y-auto overflow-x-hidden rounded-lg border border-[var(--color-input-border)] bg-white py-2 shadow-[0_4px_24px_rgba(0,0,0,0.1)]';
 
 /** Figma SelectItem row: outer p-8, inner content p-12 → py-3 px-4 (12px 16px) */
 const itemBaseClass =
@@ -55,8 +56,8 @@ export type SelectProps = SelectSingleProps | SelectMultipleProps;
 
 /**
  * Figma 스타일 셀렉트박스 (단일 / 다중 선택)
- * - 트리거: bg white, border #EEEFF1, px-16 py-12, rounded-8, placeholder #C8C9D0, chevron 18px
- * - 펼침 리스트: 흰 배경, border #EEEFF1, rounded-8, shadow 0 4px 24px, 아이템 p-12/px-16
+ * - 리스트박스는 createPortal로 document.body에 렌더 → 부모 overflow 제약 없이 노출
+ * - 뷰포트 하단 공간 부족 시 위쪽으로 자동 전환
  */
 function Select(props: SelectProps) {
   const {
@@ -83,9 +84,18 @@ function Select(props: SelectProps) {
 
   const isMultiple = props.multiple === true;
   const [open, setOpen] = React.useState(false);
-  const [dropUp, setDropUp] = React.useState(false);
   const [highlightedIndex, setHighlightedIndex] = React.useState(-1);
   const [liveAnnouncement, setLiveAnnouncement] = React.useState('');
+
+  // 리스트박스 portal 포지셔닝 상태
+  const [listboxStyle, setListboxStyle] = React.useState<{
+    top: number;
+    left: number;
+    width: number;
+    openUpward: boolean;
+    ready: boolean;
+  }>({ top: 0, left: 0, width: 0, openUpward: false, ready: false });
+
   const containerRef = React.useRef<HTMLDivElement>(null);
   const listboxRef = React.useRef<HTMLDivElement>(null);
   const isInitialMount = React.useRef(true);
@@ -106,13 +116,40 @@ function Select(props: SelectProps) {
       ? options.find((o) => o.value === selectValue)?.label ?? null
       : null;
 
+  // 리스트박스 위치 계산 — portal 환경에서 fixed 좌표로 계산
+  const updateListboxStyle = React.useCallback(() => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const listboxHeight = listboxRef.current?.offsetHeight ?? 248; // max-h-60(240) + py-2(8)
+    const offset = 8;
+    const spaceBelow = window.innerHeight - rect.bottom - offset;
+    const openUpward = spaceBelow < listboxHeight && rect.top > listboxHeight;
+    setListboxStyle({
+      top: openUpward ? rect.top - listboxHeight - offset : rect.bottom + offset,
+      left: rect.left,
+      width: rect.width,
+      openUpward,
+      ready: true,
+    });
+  }, []);
+
+  // 열릴 때 위치 계산 + 스크롤/리사이즈 대응, 닫힐 때 ready 초기화
+  React.useEffect(() => {
+    if (!open) {
+      setListboxStyle((prev) => ({ ...prev, ready: false }));
+      return;
+    }
+    updateListboxStyle();
+    window.addEventListener('resize', updateListboxStyle);
+    window.addEventListener('scroll', updateListboxStyle, true);
+    return () => {
+      window.removeEventListener('resize', updateListboxStyle);
+      window.removeEventListener('scroll', updateListboxStyle, true);
+    };
+  }, [open, updateListboxStyle]);
+
   const handleTriggerClick = () => {
     if (disabled) return;
-    if (!open && containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect();
-      // max-h-60 = 240px, mt-2 = 8px → 248px 필요
-      setDropUp(window.innerHeight - rect.bottom < 248);
-    }
     setOpen((prev) => !prev);
   };
 
@@ -152,16 +189,19 @@ function Select(props: SelectProps) {
     }
   }, [open, options, selectValue, isMultiple]);
 
+  // 외부 클릭 시 닫기 — 트리거 컨테이너와 portal 리스트박스 모두 제외
   React.useEffect(() => {
+    if (!open) return;
     const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+      const target = e.target as Node;
+      if (
+        containerRef.current?.contains(target) ||
+        listboxRef.current?.contains(target)
+      ) return;
+      setOpen(false);
     };
-    if (open) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [open]);
 
   // 키보드로 활성 옵션 변경 시 스크롤하여 보이게 함
@@ -286,39 +326,48 @@ function Select(props: SelectProps) {
         />
       </button>
 
-      {open && (
-        <div
-          ref={listboxRef}
-          id={listboxId}
-          className={cn(listBaseClass, dropUp ? 'bottom-full mb-2' : 'top-full mt-2')}
-          role="listbox"
-          aria-multiselectable={isMultiple || undefined}
-        >
-          {options.map((opt, index) => {
-            const selected = isMultiple
-              ? (selectValue as string[]).includes(opt.value)
-              : (selectValue as string) === opt.value;
-            const isHighlighted = index === highlightedIndex;
-            return (
-              <div
-                key={opt.value}
-                id={getOptionId(index)}
-                role="option"
-                aria-selected={selected}
-                className={cn(itemBaseClass, isHighlighted && 'bg-[var(--color-input-bg-hover)]')}
-                onMouseDown={(e) => e.preventDefault()}
-                onMouseEnter={() => setHighlightedIndex(index)}
-                onClick={() => {
-                  if (isMultiple) handleSelectMultiple(opt.value);
-                  else handleSelectSingle(opt.value);
-                }}
-              >
-                {opt.label}
-              </div>
-            );
-          })}
-        </div>
-      )}
+      {/* 리스트박스를 portal로 body에 렌더 — 부모 overflow 에 영향받지 않음 */}
+      {open &&
+        createPortal(
+          <div
+            ref={listboxRef}
+            id={listboxId}
+            role="listbox"
+            aria-multiselectable={isMultiple || undefined}
+            className={listBaseClass}
+            style={{
+              top: listboxStyle.top,
+              left: listboxStyle.left,
+              width: listboxStyle.width,
+              visibility: listboxStyle.ready ? 'visible' : 'hidden',
+            }}
+          >
+            {options.map((opt, index) => {
+              const selected = isMultiple
+                ? (selectValue as string[]).includes(opt.value)
+                : (selectValue as string) === opt.value;
+              const isHighlighted = index === highlightedIndex;
+              return (
+                <div
+                  key={opt.value}
+                  id={getOptionId(index)}
+                  role="option"
+                  aria-selected={selected}
+                  className={cn(itemBaseClass, isHighlighted && 'bg-[var(--color-input-bg-hover)]')}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onMouseEnter={() => setHighlightedIndex(index)}
+                  onClick={() => {
+                    if (isMultiple) handleSelectMultiple(opt.value);
+                    else handleSelectSingle(opt.value);
+                  }}
+                >
+                  {opt.label}
+                </div>
+              );
+            })}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 

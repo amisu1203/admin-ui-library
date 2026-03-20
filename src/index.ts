@@ -23,6 +23,7 @@ export type {
   FilterOption,
   FilterRowConfig,
   ToggleCalendarControlConfig,
+  SelectControlConfig,
 } from './components/filter-box';
 export {
   useCheckboxFilterControl,
