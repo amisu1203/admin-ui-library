@@ -24,7 +24,7 @@ const chevronSvg =
 
 export interface SelectOption {
   value: string;
-  label: string;
+  label: React.ReactNode;
 }
 
 interface SelectBaseProps {
